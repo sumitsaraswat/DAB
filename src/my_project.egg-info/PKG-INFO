@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: my_project
+Version: 0.0.1+20251004.144801
+Summary: wheel file based on my_project/src
+Home-page: https://databricks.com
+Author: sumit.saraswat@databricks.com
+Requires-Dist: setuptools
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary

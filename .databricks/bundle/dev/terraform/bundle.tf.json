@@ -1,0 +1,117 @@
+{
+  "terraform": {
+    "required_providers": {
+      "databricks": {
+        "source": "databricks/databricks",
+        "version": "1.63.0"
+      }
+    }
+  },
+  "provider": {
+    "databricks": {}
+  },
+  "resource": {
+    "databricks_job": {
+      "my_project_job": {
+        "deployment": {
+          "kind": "BUNDLE",
+          "metadata_file_path": "/Workspace/Users/sumit.saraswat@databricks.com/.bundle/my_project/dev/state/metadata.json"
+        },
+        "edit_mode": "UI_LOCKED",
+        "email_notifications": {
+          "on_failure": [
+            "sumit.saraswat@databricks.com"
+          ]
+        },
+        "format": "MULTI_TASK",
+        "job_cluster": [
+          {
+            "job_cluster_key": "job_cluster",
+            "new_cluster": {
+              "autoscale": {
+                "max_workers": 4,
+                "min_workers": 1
+              },
+              "node_type_id": "i3.xlarge",
+              "spark_version": "15.4.x-scala2.12"
+            }
+          }
+        ],
+        "max_concurrent_runs": 4,
+        "name": "[dev sumit_saraswat] my_project_job",
+        "queue": {
+          "enabled": true
+        },
+        "tags": {
+          "dev": "sumit_saraswat"
+        },
+        "task": [
+          {
+            "depends_on": [
+              {
+                "task_key": "refresh_pipeline"
+              }
+            ],
+            "job_cluster_key": "job_cluster",
+            "library": [
+              {
+                "whl": "dist/*.whl"
+              }
+            ],
+            "python_wheel_task": {
+              "entry_point": "main",
+              "package_name": "my_project"
+            },
+            "task_key": "main_task"
+          },
+          {
+            "job_cluster_key": "job_cluster",
+            "notebook_task": {
+              "notebook_path": "/Workspace/Users/sumit.saraswat@databricks.com/.bundle/my_project/dev/files/src/notebook"
+            },
+            "task_key": "notebook_task"
+          },
+          {
+            "depends_on": [
+              {
+                "task_key": "notebook_task"
+              }
+            ],
+            "pipeline_task": {
+              "pipeline_id": "${databricks_pipeline.my_project_pipeline.id}"
+            },
+            "task_key": "refresh_pipeline"
+          }
+        ],
+        "trigger": {
+          "pause_status": "PAUSED",
+          "periodic": {
+            "interval": 1,
+            "unit": "DAYS"
+          }
+        }
+      }
+    },
+    "databricks_pipeline": {
+      "my_project_pipeline": {
+        "configuration": {
+          "bundle.sourcePath": "/Workspace/Users/sumit.saraswat@databricks.com/.bundle/my_project/dev/files/src"
+        },
+        "deployment": {
+          "kind": "BUNDLE",
+          "metadata_file_path": "/Workspace/Users/sumit.saraswat@databricks.com/.bundle/my_project/dev/state/metadata.json"
+        },
+        "development": true,
+        "library": [
+          {
+            "notebook": {
+              "path": "/Workspace/Users/sumit.saraswat@databricks.com/.bundle/my_project/dev/files/src/dlt_pipeline"
+            }
+          }
+        ],
+        "name": "[dev sumit_saraswat] my_project_pipeline",
+        "target": "my_project_dev"
+      }
+    }
+  }
+}

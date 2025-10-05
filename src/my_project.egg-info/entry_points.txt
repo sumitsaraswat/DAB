@@ -1,0 +1,2 @@
+[packages]
+main = my_project.main:main
